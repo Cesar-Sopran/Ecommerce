@@ -1,12 +1,12 @@
 import { Button } from "@react-navigation/elements";
 import { useState } from "react";
 import {
-    Alert,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    View,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
 } from "react-native";
 
 const API_URL = "https://trabalhu-bre-e-je.vercel.app/criar-produto";
@@ -27,7 +27,7 @@ export default function ProdutoCadastroTab() {
       "nome":nome,
       "descricao":descricao,
       "preco":parseFloat(preco.replace(",", ".")),
-      "imagem":imagem
+      "imagemUrl":imagem
     };
 
     try {
