@@ -27,7 +27,7 @@ export default function ProdutoCadastroTab() {
       "nome":nome,
       "descricao":descricao,
       "preco":parseFloat(preco.replace(",", ".")),
-      "imagem":imagem
+      "imagemUrl":imagem
     };
 
     try {
