@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
-import { ActivityIndicator, FlatList, Image, StyleSheet, Text, View, TouchableOpacity } from "react-native";
-const API_URL = "https://69d2dac8336103955f8e6ec9.mockapi.io/carrinho";
+import { useState } from "react";
+import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useCarrinho } from "../carrinhoContext";
+const API_URL = "https://trabalhu-bre-e-je.vercel.app/carrinho";
 
 interface Produto {
     id: string;
@@ -15,34 +16,37 @@ export default function CarrinhoTab() {
     const [carregando, setCarregando] = useState(true);
     const [erro, setErro] = useState<string | null>(null);
 
-    async function fetchProdutos() {
-        try {
-            setCarregando(true);
-            setErro(null);
+    const { carrinho } = useCarrinho();
 
-            const response = await fetch(API_URL);
-            if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
-            const data = await response.json();
-            setProdutos(data);
-        } catch (e) {
-            setErro(e instanceof Error ? e.message : String(e));
-        } finally {
-            setCarregando(false);
-        }
-    }
 
-    useEffect(() => {
-        fetchProdutos();
-    }, []);
+    // async function fetchProdutos() {
+    //     try {
+    //         setCarregando(true);
+    //         setErro(null);
 
-    if (carregando) {
-        return (
-            <View style={styles.centrado}>
-                <ActivityIndicator size="large" color="#1a73e8" />
-                <Text style={styles.textoMutado}>Carregando produtos…</Text>
-            </View>
-        );
-    }
+    //         const response = await fetch(API_URL);
+    //         if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
+    //         const data = await response.json();
+    //         setProdutos(data);
+    //     } catch (e) {
+    //         setErro(e instanceof Error ? e.message : String(e));
+    //     } finally {
+    //         setCarregando(false);
+    //     }
+    // }
+
+    // useEffect(() => {
+    //     fetchProdutos();
+    // }, []);
+
+    // if (carregando) {
+    //     return (
+    //         <View style={styles.centrado}>
+    //             <ActivityIndicator size="large" color="#1a73e8" />
+    //             <Text style={styles.textoMutado}>Carregando produtos…</Text>
+    //         </View>
+    //     );
+    // }
 
     if (erro) {
         return (
@@ -53,7 +57,7 @@ export default function CarrinhoTab() {
     }
 
     const calcularSubtotal = () => {
-        return produtos.reduce((total, produto) => {
+        return carrinho.reduce((total, produto) => {
             return total + Number(produto.preco);
         }, 0);
     };
@@ -61,7 +65,7 @@ export default function CarrinhoTab() {
     return (
         <View style={styles.container}>
             <FlatList
-                data={produtos}
+                data={carrinho}
                 keyExtractor={(item) => item.id}
                 contentContainerStyle={styles.lista}
                 renderItem={({ item }) => <CardProduto produto={item} />}
@@ -70,7 +74,7 @@ export default function CarrinhoTab() {
                 }
             />
 
-            {produtos.length > 0 && (
+            {carrinho.length > 0 && (
                 <View style={styles.resumoCarrinho}>
                     <View style={styles.totalCarrinho}>
                         <Text style={styles.labelTotal}>Subtotal</Text>

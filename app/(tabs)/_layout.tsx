@@ -1,49 +1,51 @@
 import { Tabs } from 'expo-router';
-import React from 'react';
 
 import { HapticTab } from '@/components/haptic-tab';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { CarrinhoProvider } from '../carrinhoContext';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="produtoCadastro"
-        options={{
-          title: 'Cadastro de Produtos',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="list.bullet" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="produtosListagem"
-        options={{
-          title: 'Lista Produtos',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="list.bullet" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="carrinhoListagem"
-        options={{
-          title: 'Carrinho',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="list.bullet" color={color} />,
-        }}
-      />
-    </Tabs>
+    <CarrinhoProvider>
+      <Tabs
+        screenOptions={{
+          tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+          headerShown: false,
+          tabBarButton: HapticTab,
+        }}>
+        <Tabs.Screen
+          name="index"
+          options={{
+            title: 'Home',
+            tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="produtoCadastro"
+          options={{
+            title: 'Cadastro de Produtos',
+            tabBarIcon: ({ color }) => <IconSymbol size={28} name="list.bullet" color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="produtosListagem"
+          options={{
+            title: 'Lista Produtos',
+            tabBarIcon: ({ color }) => <IconSymbol size={28} name="list.bullet" color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="carrinhoListagem"
+          options={{
+            title: 'Carrinho',
+            tabBarIcon: ({ color }) => <IconSymbol size={28} name="list.bullet" color={color} />,
+          }}
+        />
+      </Tabs>
+    </CarrinhoProvider>
   );
 }
