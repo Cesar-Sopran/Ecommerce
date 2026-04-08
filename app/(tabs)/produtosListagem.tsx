@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, Image, StyleSheet, Text, View, } from "react-native";
 
-const API_URL = "https://69b1f310adac80b427c6863c.mockapi.io/produtos";
+const API_URL = "https://trabalhu-bre-e-je.vercel.app/produtos";
 
 interface Produto {
   id: string;
   nome: string;
   descricao: string;
   preco: string | number;
-  imagem: string;
+  imagemUrl: string;
 }
 
 export default function ProdutosListaTab() {
@@ -70,7 +70,7 @@ function CardProduto({ produto }: { produto: Produto }) {
   return (
     <View style={styles.card}>
       <Image
-        source={{ uri: produto.imagem }}
+        source={{ uri: produto.imagemUrl }}
         style={styles.imagem}
         resizeMode="cover"
       />
