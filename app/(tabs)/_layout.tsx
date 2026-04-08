@@ -1,7 +1,7 @@
 import { Tabs } from 'expo-router';
+import { HandbagIcon, ListIcon, ShoppingCartIcon } from 'phosphor-react-native';
 
 import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { CarrinhoProvider } from '../carrinhoContext';
@@ -18,31 +18,24 @@ export default function TabLayout() {
           tabBarButton: HapticTab,
         }}>
         <Tabs.Screen
-          name="index"
-          options={{
-            title: 'Home',
-            tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-          }}
-        />
-        <Tabs.Screen
           name="produtoCadastro"
           options={{
             title: 'Cadastro de Produtos',
-            tabBarIcon: ({ color }) => <IconSymbol size={28} name="list.bullet" color={color} />,
+            tabBarIcon: ({ color }) => <HandbagIcon size={28} name="" color={color} />,
           }}
         />
         <Tabs.Screen
-          name="produtosListagem"
+          name="index"
           options={{
             title: 'Lista Produtos',
-            tabBarIcon: ({ color }) => <IconSymbol size={28} name="list.bullet" color={color} />,
+            tabBarIcon: ({ color }) => <ListIcon size={28} name="list.bullet" color={color} />,
           }}
         />
         <Tabs.Screen
           name="carrinhoListagem"
           options={{
             title: 'Carrinho',
-            tabBarIcon: ({ color }) => <IconSymbol size={28} name="list.bullet" color={color} />,
+            tabBarIcon: ({ color }) => <ShoppingCartIcon size={28} name="list.bullet" color={color} />,
           }}
         />
       </Tabs>

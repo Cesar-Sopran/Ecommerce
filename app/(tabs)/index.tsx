@@ -1,98 +1,200 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  FlatList,
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from "react-native";
+import { useCarrinho } from "../carrinhoContext";
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+const API_URL = "https://trabalhu-bre-e-je.vercel.app";
 
-export default function HomeScreen() {
+interface Produto {
+  id: string;
+  nome: string;
+  descricao: string;
+  preco: string | number;
+  imagemUrl: string;
+}
+
+function CardProduto({ produto, onAdicionar }: { produto: Produto, onAdicionar: () => void }) {
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+    <Pressable
+      style={({ hovered, pressed }) => [
+        styles.card,
+        hovered && styles.cardHover,
+        pressed && styles.cardPressed
+      ]}
+    >
+      <Image
+        source={{ uri: produto.imagemUrl }}
+        style={styles.imagem}
+        resizeMode="cover"
+      />
+      <View style={styles.info}>
+        <View>
+          <Text style={styles.nome}>{produto.nome}</Text>
+          <Text style={styles.descricao} numberOfLines={2}>
+            {produto.descricao}
+          </Text>
+        </View>
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+        <View style={styles.containerPrecoBotao}>
+          <Text style={styles.preco}>
+            {Number(produto.preco).toLocaleString("pt-BR", {
+              style: "currency",
+              currency: "BRL",
+            })}
+          </Text>
+
+          <TouchableOpacity 
+            activeOpacity={0.7} 
+            style={styles.botaoCarrinho} 
+            onPress={onAdicionar}
+          >
+            <Text style={styles.textoBotao}>+ Carrinho</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Pressable>
   );
 }
 
+
+export default function ProdutosListaTab() {
+  const [produtos, setProdutos] = useState<Produto[]>([]);
+  const [carregando, setCarregando] = useState(true);
+  const [erro, setErro] = useState<string | null>(null);
+
+  const { adicionarProdutoAoCarrinho } = useCarrinho();
+
+  async function fetchProdutos() {
+    try {
+      setCarregando(true);
+      setErro(null);
+
+      const response = await fetch(`${API_URL}/produtos`);
+      if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
+      const data = await response.json();
+      setProdutos(data);
+    } catch (e) {
+      setErro(e instanceof Error ? e.message : String(e));
+    } finally {
+      setCarregando(false);
+    }
+  }
+
+  async function adicionarAoCarrinho(item) {
+    try {
+      // const response = await fetch(`${API_URL}/adicionar-carrinho/${id}`, {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      // });
+
+      console.log(item)
+
+      // if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
+      // alert("Produto adicionado ao carrinho!");
+    } catch (e) {
+      alert("Erro ao adicionar produto.");
+    }
+  }
+
+  useEffect(() => {
+    fetchProdutos();
+  }, []);
+
+  if (carregando) {
+    return (
+      <View style={styles.centrado}>
+        <ActivityIndicator size="large" color="#1a73e8" />
+        <Text style={styles.textoMutado}>Carregando produtos…</Text>
+      </View>
+    );
+  }
+
+  if (erro) {
+    return (
+      <View style={styles.centrado}>
+        <Text style={styles.textoErro}>Falha ao carregar: {erro}</Text>
+      </View>
+    );
+  }
+
+  return (
+    <FlatList
+      data={produtos}
+      keyExtractor={(item) => item.id}
+      contentContainerStyle={styles.lista}
+      renderItem={({ item }) => (
+        <CardProduto
+          produto={item}
+          onAdicionar={() => adicionarProdutoAoCarrinho(item)}
+        />
+      )}
+      ListEmptyComponent={
+        <Text style={styles.textoMutado}>Nenhum produto cadastrado.</Text>
+      }
+    />
+  );
+}
+
+
+
 const styles = StyleSheet.create({
-  titleContainer: {
+  lista: { padding: 12, gap: 12 },
+  card: {
+    flexDirection: "row",
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+    overflow: "hidden",
+    transitionProperty: "all",
+    transitionDuration: "0.2s",
+  },
+  cardHover: {
+    borderColor: "#1a73e8",
+    backgroundColor: "#f8fbff",
+    transform: [{ scale: 1.01 }],
+    elevation: 4, // Sombra para Android
+    shadowColor: "#000", // Sombra para iOS
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  cardPressed: {
+    opacity: 0.9,
+    backgroundColor: "#f0f0f0",
+  },
+  imagem: { width: 100, height: 100 },
+  info: { flex: 1, padding: 10, justifyContent: "space-between" },
+  nome: { fontSize: 15, fontWeight: "600", color: "#111" },
+  descricao: { fontSize: 13, color: "#666", marginTop: 4 },
+  preco: { fontSize: 15, fontWeight: "700", color: "#1a73e8" },
+
+  containerPrecoBotao: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    gap: 8,
+    marginTop: 6,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  botaoCarrinho: {
+    backgroundColor: '#1a73e8',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 6,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  textoBotao: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
   },
+  centrado: { flex: 1, alignItems: "center", justifyContent: "center", padding: 32, gap: 12 },
+  textoMutado: { color: "#888", fontSize: 14 },
+  textoErro: { color: "#c0392b", fontSize: 14, textAlign: "center" },
 });
