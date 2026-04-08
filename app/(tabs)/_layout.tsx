@@ -24,6 +24,13 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="produtoCadastro"
+        options={{
+          title: 'Cadastro de Produtos',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="list.bullet" color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="produtosListagem"
         options={{
           title: 'Lista Produtos',
