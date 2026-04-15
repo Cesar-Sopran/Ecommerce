@@ -16,18 +16,38 @@ export default function ProdutoCadastroTab() {
   const [descricao, setDescricao] = useState("");
   const [preco, setPreco] = useState("");
   const [imagem, setImagem] = useState("");
+  const [erros, setErros] = useState<{ nome?: string; descricao?: string; preco?: string; imagem?: string }>({});
+
+  function formatarPreco(valor: string) {
+    const apenasDigitos = valor.replace(/[^0-9]/g, "");
+    if (!apenasDigitos) return "";
+
+    const partes = apenasDigitos.padStart(3, "0");
+    const inteiros = partes.slice(0, -2);
+    const decimais = partes.slice(-2);
+    return `${parseInt(inteiros, 10).toString()},${decimais}`;
+  }
 
   async function handleSalvar() {
-    if (!nome || !descricao || !preco || !imagem) {
-      Alert.alert("Atenção", "Por favor, preencha todos os campos.");
+    const novoErros: { nome?: string; descricao?: string; preco?: string; imagem?: string } = {};
+
+    if (!nome.trim()) novoErros.nome = "Preencha o nome do produto.";
+    if (!descricao.trim()) novoErros.descricao = "Preencha a descrição do produto.";
+    if (!preco.trim()) novoErros.preco = "Preencha o preço do produto.";
+    if (!imagem.trim()) novoErros.imagem = "Preencha a URL da imagem.";
+
+    if (Object.keys(novoErros).length > 0) {
+      setErros(novoErros);
       return;
     }
 
+    setErros({});
+
     const novoProduto = {
-      "nome":nome,
-      "descricao":descricao,
-      "preco":parseFloat(preco.replace(",", ".")),
-      "imagemUrl":imagem
+      nome,
+      descricao,
+      preco: parseFloat(preco.replace(",", ".")),
+      imagemUrl: imagem,
     };
 
     try {
@@ -57,39 +77,55 @@ export default function ProdutoCadastroTab() {
       <View style={styles.form}>
         <Text style={styles.label}>Nome:</Text>
         <TextInput
-          style={styles.input}
+          style={[styles.input, erros.nome && styles.inputError]}
           value={nome}
-          onChangeText={setNome}
+          onChangeText={(text) => {
+            setNome(text);
+            setErros((prev) => ({ ...prev, nome: undefined }));
+          }}
           placeholder="Ex: Teclado Mecânico"
         />
+        {erros.nome ? <Text style={styles.erroTextoCampo}>{erros.nome}</Text> : null}
 
         <Text style={styles.label}>Descrição:</Text>
         <TextInput
-          style={[styles.input, styles.textArea]}
+          style={[styles.input, styles.textArea, erros.descricao && styles.inputError]}
           value={descricao}
-          onChangeText={setDescricao}
+          onChangeText={(text) => {
+            setDescricao(text);
+            setErros((prev) => ({ ...prev, descricao: undefined }));
+          }}
           placeholder="Detalhes do produto..."
           multiline
           numberOfLines={3}
         />
+        {erros.descricao ? <Text style={styles.erroTextoCampo}>{erros.descricao}</Text> : null}
 
         <Text style={styles.label}>Preço:</Text>
         <TextInput
-          style={styles.input}
+          style={[styles.input, erros.preco && styles.inputError]}
           value={preco}
-          onChangeText={setPreco}
+          onChangeText={(text) => {
+            setPreco(formatarPreco(text));
+            setErros((prev) => ({ ...prev, preco: undefined }));
+          }}
           placeholder="0,00"
           keyboardType="numeric"
         />
+        {erros.preco ? <Text style={styles.erroTextoCampo}>{erros.preco}</Text> : null}
 
         <Text style={styles.label}>URL da Imagem:</Text>
         <TextInput
-          style={styles.input}
+          style={[styles.input, erros.imagem && styles.inputError]}
           value={imagem}
-          onChangeText={setImagem}
+          onChangeText={(text) => {
+            setImagem(text);
+            setErros((prev) => ({ ...prev, imagem: undefined }));
+          }}
           placeholder="https://link-da-imagem.com/foto.jpg"
           autoCapitalize="none"
         />
+        {erros.imagem ? <Text style={styles.erroTextoCampo}>{erros.imagem}</Text> : null}
 
         <Button style={styles.botao} onPress={handleSalvar}>Cadastrar Produto</Button>
       </View>
@@ -133,12 +169,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
     fontSize: 16,
-    marginBottom: 16,
+    marginBottom: 8,
     color: "gray",
+  },
+  inputError: {
+    borderColor: "#c0392b",
   },
   textArea: {
     height: 80,
     textAlignVertical: "top",
+  },
+  erroTextoCampo: {
+    color: "#c0392b",
+    fontSize: 13,
+    marginBottom: 12,
   },
   botao: {
     padding: 15,

@@ -1,3 +1,4 @@
+import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -6,10 +7,8 @@ import {
   Pressable,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View
 } from "react-native";
-import { useCarrinho } from "../carrinhoContext";
 
 const API_URL = "https://trabalhu-bre-e-je.vercel.app";
 
@@ -21,9 +20,10 @@ interface Produto {
   imagemUrl: string;
 }
 
-function CardProduto({ produto, onAdicionar }: { produto: Produto, onAdicionar: () => void }) {
+function CardProduto({ produto, onPress }: { produto: Produto, onPress: () => void }) {
   return (
     <Pressable
+      onPress={onPress}
       style={({ hovered, pressed }) => [
         styles.card,
         hovered && styles.cardHover,
@@ -43,22 +43,12 @@ function CardProduto({ produto, onAdicionar }: { produto: Produto, onAdicionar: 
           </Text>
         </View>
 
-        <View style={styles.containerPrecoBotao}>
-          <Text style={styles.preco}>
-            {Number(produto.preco).toLocaleString("pt-BR", {
-              style: "currency",
-              currency: "BRL",
-            })}
-          </Text>
-
-          <TouchableOpacity 
-            activeOpacity={0.7} 
-            style={styles.botaoCarrinho} 
-            onPress={onAdicionar}
-          >
-            <Text style={styles.textoBotao}>+ Carrinho</Text>
-          </TouchableOpacity>
-        </View>
+        <Text style={styles.preco}>
+          {Number(produto.preco).toLocaleString("pt-BR", {
+            style: "currency",
+            currency: "BRL",
+          })}
+        </Text>
       </View>
     </Pressable>
   );
@@ -66,11 +56,10 @@ function CardProduto({ produto, onAdicionar }: { produto: Produto, onAdicionar: 
 
 
 export default function ProdutosListaTab() {
+  const router = useRouter();
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
-
-  const { adicionarProdutoAoCarrinho } = useCarrinho();
 
   async function fetchProdutos() {
     try {
@@ -85,22 +74,6 @@ export default function ProdutosListaTab() {
       setErro(e instanceof Error ? e.message : String(e));
     } finally {
       setCarregando(false);
-    }
-  }
-
-  async function adicionarAoCarrinho(item) {
-    try {
-      // const response = await fetch(`${API_URL}/adicionar-carrinho/${id}`, {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      // });
-
-      console.log(item)
-
-      // if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
-      // alert("Produto adicionado ao carrinho!");
-    } catch (e) {
-      alert("Erro ao adicionar produto.");
     }
   }
 
@@ -133,7 +106,12 @@ export default function ProdutosListaTab() {
       renderItem={({ item }) => (
         <CardProduto
           produto={item}
-          onAdicionar={() => adicionarProdutoAoCarrinho(item)}
+          onPress={() =>
+            router.push({
+              pathname: "/produtoDetalhes",
+              params: { produto: JSON.stringify(item) },
+            })
+          }
         />
       )}
       ListEmptyComponent={
@@ -177,23 +155,6 @@ const styles = StyleSheet.create({
   descricao: { fontSize: 13, color: "#666", marginTop: 4 },
   preco: { fontSize: 15, fontWeight: "700", color: "#1a73e8" },
 
-  containerPrecoBotao: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 6,
-  },
-  botaoCarrinho: {
-    backgroundColor: '#1a73e8',
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 6,
-  },
-  textoBotao: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
   centrado: { flex: 1, alignItems: "center", justifyContent: "center", padding: 32, gap: 12 },
   textoMutado: { color: "#888", fontSize: 14 },
   textoErro: { color: "#c0392b", fontSize: 14, textAlign: "center" },
