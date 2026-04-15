@@ -38,6 +38,12 @@ export default function TabLayout() {
             tabBarIcon: ({ color }) => <ShoppingCartIcon size={28} name="list.bullet" color={color} />,
           }}
         />
+        <Tabs.Screen
+          name="produtoDetalhes"
+          options={{
+            href: null,
+          }}
+        />
       </Tabs>
     </CarrinhoProvider>
   );
