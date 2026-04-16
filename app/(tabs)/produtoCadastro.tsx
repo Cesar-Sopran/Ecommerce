@@ -1,12 +1,11 @@
 import { Button } from "@react-navigation/elements";
 import { useState } from "react";
 import {
-  Alert,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
-  View,
+  View
 } from "react-native";
 
 const API_URL = "https://trabalhu-bre-e-je.vercel.app/criar-produto";
@@ -59,14 +58,14 @@ export default function ProdutoCadastroTab() {
 
       if (!response.ok) throw new Error("Erro ao salvar produto");
 
-      Alert.alert("Sucesso", "Produto cadastrado com sucesso!");
+      alert("Produto cadastrado com sucesso!");
       setNome("");
       setDescricao("");
       setPreco("");
       setImagem("");
       
     } catch (error) {
-      Alert.alert("Erro", "Não foi possível cadastrar o produto.");
+      alert("Não foi possível cadastrar o produto.");
     }
   }
 
