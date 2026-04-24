@@ -1,4 +1,4 @@
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
@@ -18,6 +18,7 @@ export const unstable_settings = {
 
 export default function ProdutoDetalhes() {
   const { produto } = useLocalSearchParams<{ produto?: string }>();
+  const router = useRouter();
   const [adicionando, setAdicionando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
 
@@ -41,7 +42,7 @@ export default function ProdutoDetalhes() {
         headers: { "Content-Type": "application/json" },
       });
       if (!response.ok) throw new Error("Erro ao adicionar ao carrinho");
-      alert("Produto adicionado ao carrinho!");
+      router.push("/(tabs)/carrinhoListagem");
     } catch (e) {
       const mensagem = e instanceof Error ? e.message : "Erro desconhecido";
       setErro(mensagem);
